@@ -1,7 +1,6 @@
 #zomato dataset - data cleaning
 
 library(readr)
-zomato <- read_csv("~/Documents/MYcadeMYa/current/LSE/fourth year 2018:19/ST309 Elementary Data Analytics/Project/zomato-restaurants-data/zomato.csv")
 View(zomato)
 summary(zomato)
 #removing redundant variables 
