@@ -103,7 +103,8 @@ bar1 <- ggplot(zomatoclean) + geom_bar(aes(country),stat="count") + labs(title="
 p1f <- ggplot(zomatoclean) + geom_point(aes(y=`Aggregate rating`, x=USDaveragecost)) + labs(title="Plot of Aggregate Rating against Average Cost (USD) (Global)", x="Average cost for two in USD", y="Aggregate Rating") + facet_wrap(vars(country), ncol=3)
 p1f
 #subsetting data - exploring India
-zomatoindia <- subset(zomatoclean, country=="India") View(zomatoindia)
+zomatoindia <- subset(zomatoclean, country=="India") 
+View(zomatoindia)
 # adding city center location and euclidian distance of the restaurant from city centre.
 # Data on city center location from https://latitudelongitude.org/in/ summary(zomatoindia$City)
 zomatoindia$centrelong <- 0
@@ -198,16 +199,18 @@ zomatoindia$centrelat[zomatoindia$City== "Mohali"]=30.67995
 zomatoindia$centrelat[zomatoindia$City== "Panchkula"]=0.73629
 zomatoindia$centredist <- sqrt((zomatoindia$centrelong-zomatoindia$Longitude)^2+ (zomatoindia$centrelat-zomatoindia$Latitude)^2)
 #add Capital_dummy variable
-zomatoindia$capital <- 0 zomatoindia$capital[zomatoindia$City== "New Delhi"]=1
+zomatoindia$capital <- 0 
+zomatoindia$capital[zomatoindia$City== "New Delhi"]=1
 #add number of cuisines variable
-zomatoindia$cuisinenumber<-8 zomatoindia$cuisinenumber <-
-ifelse(zomatoindia$Cuisines_2 %in% NA, 1, ifelse(zomatoindia$Cuisines_3 %in% NA, 2,
+zomatoindia$cuisinenumber<-8 
+zomatoindia$cuisinenumber <- ifelse(zomatoindia$Cuisines_2 %in% NA, 1, ifelse(zomatoindia$Cuisines_3 %in% NA, 2,
 ifelse(zomatoindia$Cuisines_4 %in% NA, 3, ifelse(zomatoindia$Cuisines_5 %in% NA, 4,
 ifelse(zomatoindia$Cuisines_6 %in% NA, 5, ifelse(zomatoindia$Cuisines_7 %in% NA, 6,
 ifelse(zomatoindia$Cuisines_8 %in% NA, 7, 8)))))))
 zomatoindiaprice0 <- zomatoindia[!zomatoindia$USDaveragecost==0,]
 #exploratory analysis
-install.packages("tidyverse") library(tidyverse)
+install.packages("tidyverse") 
+library(tidyverse)
 hist(zomatoindia$`Aggregate rating`)
 #relationship between touristy and aggregate rating
 p3 <- ggplot(zomatoindia) + geom_boxplot(aes(x=`touristy`, y=`Aggregate rating`, group=`touristy`, fill=`touristy`)) + labs(title="Aggregate Ratings for restaurants in 'Touristy cities'", x='Touristy city?', y="Aggregate Rating") + guides(fill=FALSE)
@@ -244,15 +247,12 @@ pal="xmen")
 library('stats')
 # To conduct a clustering analysis we can use only quantitative data. Hence we create a new dataset. Given that many restaurants are in null island we also need to make sure that distance variable that we get makes sense. For this reason we look at the distance variable and see where values 'jump'.
 summary(zomatoindia)
-zomatoindianumeric <- data.frame(zomatoindia["dn"], zomatoindia["tb"],
- zomatoindia["od"], zomatoindia["touristy"], zomatoindia["Aggregate
-rating"],zomatoindia["USDaveragecost"], zomatoindia["centredist"]) zomatoindianumeric <-subset(zomatoindianumeric,
-zomatoindianumeric$centredist<20)
+zomatoindianumeric <- data.frame(zomatoindia["dn"], zomatoindia["tb"],zomatoindia["od"], zomatoindia["touristy"], zomatoindia["Aggregate rating"],zomatoindia["USDaveragecost"], zomatoindia["centredist"]) 
+zomatoindianumeric <-subset(zomatoindianumeric,zomatoindianumeric$centredist<20)
 # We need to standardise the data to be able to do clustering normaliseddata <- scale(zomatoindianumeric)
 # Calculate Euclidian distance
 distance <- dist(normaliseddata)
-# To evaluate the number of clusters needed we create a new function (using
- Elbow plot)
+# To evaluate the number of clusters needed we create a new function (using Elbow plot)
 set.seed=42
 evaluationvariable <- function(normaliseddata,nc=20){
 clustering <- (nrow(normaliseddata)-1)*sum(apply(normaliseddata,2,var)) for(i in 2:nc)
@@ -260,8 +260,7 @@ clustering[i]<-sum(kmeans(normaliseddata,centers=i)$withinss) plot(1:nc, cluster
    group sums of squares")
 }
 evaluationvariable(normaliseddata, nc=20)
-# In addition, we can run it as the following (another way to run the same
- procedure)
+# In addition, we can run it as the following (another way to run the same procedure)
 k.max <- 20
 data <- scaled_data wss <- sapply(1:k.max,
 function(k){kmeans(normaliseddata, k, nstart=50,iter.max = 20 )$tot.withinss})
@@ -269,13 +268,11 @@ wss
 plot(1:k.max, wss,
 type="b", pch = 19, frame = FALSE, xlab="Number of clusters K",
 ylab="Total within-clusters sum of squares")
-# We can see that 15 clusters lwoers within group variation to a
- sufficiently low extent
+# We can see that 15 clusters lwoers within group variation to a sufficiently low extent
 k.means.fit <- kmeans(normaliseddata, 15)
 attributes(k.means.fit) k.means.fit$centers k.means.fit$cluster k.means.fit$tot.withinss
 
-# Now we need to construct a classification mechanism to study those
- clusters
+# Now we need to construct a classification mechanism to study those clusters
 zomatoindianumeric$clusterised <- as.factor(k.means.fit$cluster)
 treeclust1 <- rpart(cluster1~ .-clusterised-cluster7-cluster2-cluster3-cluster4-cluster5-cluster6-cluster8-cluster9-cluster10-cluster11-cluster12-cluster13-cluster14-cluster15, data= zomatoindianumeric, cp=.02)
 rpart.plot(treeclust1, box.palette="RdBu", shadow.col="gray", nn=TRUE)
